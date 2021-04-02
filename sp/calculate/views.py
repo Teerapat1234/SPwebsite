@@ -221,7 +221,6 @@ def scale(Posts, original, percentage):     #Scale the image down and calculates
     template2 = template.copy()
     template = cv2.Canny(template, 100, 150)
     (tH, tW) = template.shape[:2]
-
     count_day, day_count, results, num, postNumPerDay, UpDown = 0, 0, [], 0, [], []  # For every 100 we cut to the next day
     for post in Posts:
         count_day += 1
@@ -289,7 +288,7 @@ def mathmatical(UpDown, postNumPerDay):
     ax.plot(t, I / N, 'r', alpha=0.5, lw=2, label='meme creators')
     ax.plot(t, R / N, 'g', alpha=0.5, lw=2, label='bored meme creators')
     ax.set_xlabel('Time /days')
-    ax.set_ylabel('Number (1000s)')
+    ax.set_ylabel('Number of posts (In %)')
     ax.set_ylim(0, 1.0)
     ax.set_xlim(0, 7)  #
     ax.yaxis.set_tick_params(length=0)
@@ -339,8 +338,7 @@ def scrape(request):
     try:
         date_back = int(request.POST.get('input_days'))
         year, month, day = int(dateArr[0]), int(dateArr[1]), int(dateArr[2])
-        percentage = request.POST.get('percent')
-        percentage = float(percentage) / 100.0
+        percentage = float(request.POST.get('percent')) / 100.0
         uploaded_img.save(img_path)
     except:
         return render(request, 'error.html')
@@ -350,14 +348,11 @@ def scrape(request):
     Posts = readjson(year, month, day, date_back)  # read the database and retrieve the stored info
     results, postNumPerDay, UpDown = scale(Posts, original, percentage)  # The picture comparison part
     # ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    # ///////////////////////////////////////////////////////////////////////////////////////////////////////
     plot_data(postNumPerDay)  # Set up the scale of the graph
     S, I, R, beta, gamma = mathmatical(UpDown, postNumPerDay)  # The graph part
     # ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    pos = informative(I, date_back)
-    date_back = day + date_back
+    pos, date_back = informative(I, date_back), day + date_back
     return render(request, 'output.html',
                   {"results": results, "year": year, "month": month, "day": day, "days": date_back, "sim": percentage,
                    "maxI": pos[0], "trend_over": pos[1]
@@ -366,8 +361,6 @@ def scrape(request):
 def index(request):
     form = ImageForm()
     return render(request, 'Home.html', {'form': form})
-    # return render(request, 'index.html', {'form': form})
-    # return render(request, "index.html")
 def home(request):
     form = ImageForm()
     return render(request, 'Home.html', {'form': form})
@@ -420,15 +413,10 @@ def image_upload_view(request):  # process img uploaded by users
         uploaded_img = Image.open(request.FILES['image'])
         img_path = os.path.join(BASE_DIR, "storeimg/1.jpg")
         uploaded_img.save(img_path)
-        original = cv2.imread(img_path)  # This value is the img used to compare
-
         return render(request, 'index.html', {'img_obj': img_path})
     else:  # essentially saying request.method==GET, meaning that we're request seeign the img
         form = ImageForm()
     return render(request, 'index.html', {'form': form})
-
-
 ##---------------------------------------------------------------------------------------------------------
-
 def try_this(request):
     return render(request, 'output.html')
