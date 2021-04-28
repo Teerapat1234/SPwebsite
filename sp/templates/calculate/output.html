@@ -1,54 +1,61 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<!--    <link rel="stylesheet" href="css.css">-->
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta charset = "UTF-8">
+<meta name = " viewport" content = "width = device-width, initial-scale = 1">
+<link rel = "stylesheet" href = "https://www.w3schools.com/w3css/4/w3.css">
+<link rel = "stylesheet" href = "https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-	<link rel = "stylesheet" href = "https://www.w3schools.com/w3css/4/w3.css">
-	<link rel = "stylesheet" href = "https://www.w3schools.com/lib/w3-theme-black.css">
-	<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Calculator</title>
-</head>
-<body class="bg-light">
-<!-- nav bar -->
+<style>
+	body{
+		max-height: 70%;
+		overflow-y: auto;
+	}
+	img.hover-shadow{
+		transition: 0.3s;
+	}
+	.hover-shadow:hover{
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	}
+	.center {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		width: 50%;
+	}
+</style>
+<title>Calculator</title>
+<body class = "w3-theme-black" id = "today">
+	<!-- nav bar -->
 	<div class="w3-top" id = "navbar">
 		<div class="w3-bar w3-theme-d2 w3-left-align">
 		<!--<a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-hover-white w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>-->
-		<a href="#" class="w3-bar-item w3-button w3-yellow"><i class="fa fa-home w3-margin-right"></i>Meme Scraper</a>
-		<a href="#team" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Today's Shown Analysis</a>
-		<a href="#work" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Meme Analysis</a>
-		<a href="#contact" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Contact</a>
-			<!--<div class="w3-dropdown-hover w3-hide-small">
-			<button class="w3-button" title="Notifications">Dropdown <i class="fa fa-caret-down"></i></button>     
-				<div class="w3-dropdown-content w3-card-4 w3-bar-block">
-				<a href="#" class="w3-bar-item w3-button">Link</a>
-				<a href="#" class="w3-bar-item w3-button">Link</a>
-				<a href="#" class="w3-bar-item w3-button">Link</a>
-				</div>-->
+		<a href = "{% url 'home' %}" class="w3-bar-item w3-button w3-yellow"><i class="fa fa-home w3-margin-right"></i>Meme Scraper</a>
+
+		<div id="nav">
+            <div><a href="{% url 'today' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Today's Most Popular Meme</a></div>
+        	<div><a href="{% url 'analysis' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Meme Analysis</a></div>
+		</div>
+
 		</div>
 		<!--<a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-hover-teal" title="Search"><i class="fa fa-search"></i></a>-->
 	</div>
 
-<img class="img-fluid" style="margin-left: 180px; margin-top: 60px" src="{% static 'graph.jpg' %}">
+<img class="img-fluid" style="margin-left: 300px; margin-top: 60px" src="{% static 'graph.jpg' %}">
 
-<img class="img-fluid" style="margin-left: 180px; margin-top: 5px" src="{% static 'data.jpg' %}">
+<!--<img class="img-fluid" style="margin-left: 180px; margin-top: 5px" src="{% static 'data.jpg' %}">-->
 
 <div class="container-fluid" style="margin-bottom: 20rem;">
     <div class="row">
         <div class="col-md-6" style="margin: 1rem auto 0 auto;">
             <div class="card">
-                <div class="card-body" style="margin-top: 60px">
+                <div class="card-body" style="margin-top: 20px" align = "center">
                     <!--{% for post in posts %}
                     <pre>{{ post.title }}</pre>
                     {% endfor %}-->
 
-                    Number of total posts with {{ sim }}% similarity: {{ results|length }} posts
+                    Number of total posts with more than {{ sim }}% similarity: {{ results|length }} posts
                     <!--<pre></pre>
                     test: {{ results }}-->
                     <pre></pre>
@@ -58,7 +65,23 @@
                     Meme peak popularity might lie around day: {{ maxI }}
 
                     <pre></pre>
-                    slope: {{ slope }}, recov: {{ recov }}
+                    Trend rate: {{ slope }}
+
+                    <pre></pre>
+                    Decrease in popularity rate: {{ recov }}
+
+                    <pre></pre>
+                    {{ descrip }}
+
+                    <pre></pre>
+                    {{ descrip2 }}
+
+                    <pre></pre>
+                    The data source is taken from Reddit's New category, thus the data is representative of the current format trend, or lack of.
+                    Please keep in mind that for a meme to become "popular", the red line should be able to overtake the blue line at some point.
+                    And that in order for the meme to remain popular, the ratio between (Trend rate / Decrease in popularity rate) must be low.
+                    A low Trend rate might suggests that this red line is consisted mostly by accidental posts with similar feature to your format.
+
                 </div>
             </div>
         </div>

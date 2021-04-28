@@ -2,37 +2,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!--    <link rel="stylesheet" href="css.css">-->
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta charset = "UTF-8">
+<meta name = " viewport" content = "width = device-width, initial-scale = 1">
+<link rel = "stylesheet" href = "https://www.w3schools.com/w3css/4/w3.css">
+<link rel = "stylesheet" href = "https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+<style>
+	body{
+		max-height: 70%;
+		overflow-y: auto;
+	}
+	img.hover-shadow{
+		transition: 0.3s;
+	}
+	.hover-shadow:hover{
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	}
+	.center {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		width: 50%;
+	}
+</style>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-    <title>calculator</title>
+<title>calculator</title>
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #000000;">
-    <a class="navbar-brand" href="#" style="color: white;">A seemingly expensive meme scraper</a>
-    <!--<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>//-->
+<body class = "w3-theme-black" id = "analysis">
+<div class="w3-top" id = "navbar">
+		<div class="w3-bar w3-theme-d2 w3-left-align">
+		<!--<a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-hover-white w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>-->
+		<a href = "{% url 'index' %}" class="w3-bar-item w3-button w3-yellow"><i class="fa fa-home w3-margin-right"></i>Meme Scraper</a>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="#">About</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+		<div id="nav">
+            <div><a href="{% url 'today' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Today's Most Popular Meme</a></div>
+        	<div><a href="{% url 'analysis' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Meme Analysis</a></div>
+		</div>
 
-<div class="container-fluid" style="margin-bottom: 20rem;">
+		</div>
+		<!--<a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-hover-teal" title="Search"><i class="fa fa-search"></i></a>-->
+	</div>
+<div style="margin-top: 30px" class="w3-container w3-padding-15 w3-gray" id="greybarindex">
+	<h2 style="margin-top: 15px; margin-bottom: 15px" align = "center"> IN case you wonder what the similarity standard of your template should look be,
+                    please use this box to compare your format to our 5 arbitrarily selected formats.</h2>
+</div>
+
+<div class="container-fluid" style="margin-bottom: 5rem; margin-top: 80px">
     <div class="row">
         <div class="col-md-6" style="margin: 1rem auto 0 auto;">
-            <img class="img-fluid" style="margin-top: 60px" src="{% static 'apple.png' %}">
+<!--            <img class="img-fluid" style="margin-top: 60px" src="{% static 'apple.png' %}">-->
+            <div class="card">
+                </form>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'trial'%}">
+                    Upload your format here.
+                    <pre></pre>
+                    Please choose a picture as your meme template:
+                    <input type="file" name="trial">
+                    {% csrf_token %}
+                    <!--{{ form.as_p }}-->
+
+                    <pre></pre>
+                    <button type="reset">Reset</button>
+                    <button type="submit">begin similarity checking</button>
+                    </row>
+
+                </form>
+                {% if img_obj %}
+                <h3>Successfully uploaded : {{img_obj}}</h3>
+                <img src="../storeimg/2.jpg" alt="connect">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6" style="margin: 0 auto;"></div>
+    </div>
+</div>
+
+<div style="margin-top: 30px" class="w3-container w3-padding-15 w3-gray" id="greybarindex">
+	<h3 style="margin-top: 15px; margin-bottom: 15px" align = "center"> The threshold level is crucial to the accuracy of the output.</h3>
+</div>
+
+<div class="container-fluid" style="margin-bottom: 10rem">
+    <div class="row">
+        <div class="col-md-6" style="margin: 1rem auto 0 auto;">
+<!--            <img class="img-fluid" style="margin-top: 60px" src="{% static 'apple.png' %}">-->
             <div class="card">
                 <!--<form method="POST" enctype="multipart/form-data" action="{% url 'image_upload_view'%}">
                     Please specify a file, or a set of files:
@@ -51,8 +110,18 @@
                     <label for="input_days">Upto 1-7 days:</label>
                     <input type="number" id="input_days" name="input_days" min="1" max="7">
 
+                     <pre></pre>
+                    Please choose the subreddit you want to compare with:
+                    <select name="subreddit" id="subreddit">
+                      <option value="dankmemes">dankmemes</option>
+                      <option value="memes">memes</option>
+                      <option value="funny">funny</option>
+                    </select>
+
                     <pre></pre>
                     Please choose a picture as your meme template:
+                    <pre></pre>
+                    Noted: The format here should be cleaned of any title, top, bottom text for better accuracy.
                     <input type="file" name="image">
                     {% csrf_token %}
                     <!--{{ form.as_p }}-->
@@ -61,11 +130,6 @@
                     Accuracy threshold:
                     <label for="percent">Upto 1%-100%:</label>
                     <input type="number" id="percent" name="percent" min="1" max="100">
-
-<!--                    <pre></pre>-->
-<!--                    Allow higher test accuracy methods:-->
-<!--                    <label for="allow">*This task will take a while to accomplish</label>-->
-<!--                    <input type="checkbox" id="allow" name="allow">-->
 
                     <pre></pre>
                     <button type="reset">Reset</button>
@@ -77,57 +141,14 @@
                 <h3>Successfully uploaded : {{img_obj}}</h3>
                 <img src="../storeimg/1.jpg" alt="connect">
                 {% endif %}
-                <!--<div class="card-body">
-                    <form method="GET" action="{% url 'submitquery'%}">
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="query" , id="query">
-                        </div>
-                        <div class="row">
-                            <input type="submit" class="btn btn-primary" style="margin-left:auto;margin-right:auto">
-                        </div>
-                    </form>
-                </div>-->
             </div>
-            <!--<div>
-                <form method="POST" enctype="multipart/form-data" action="{% url 'test'%}">
-                    <pre></pre>
-                    Please input the first date of scraping:
-                    <input type="date" id="idate" name="idate">
-
-                    <pre></pre>
-                    Please input the number of days the scrape will be done:
-                    <label for="input_days">Upto 1-7 days:</label>
-                    <input type="number" id="idays" name="idays" min="1" max="7">
-
-                    <pre></pre>
-                    Please choose a picture as your meme template:
-                    <input type="file" name="image">
-                    {% csrf_token %}
-
-                    <pre></pre>
-                    Accuracy threshold:
-                    <label for="per">Upto 1%-100%:</label>
-                    <input type="number" id="per" name="per" min="1" max="100">
-
-                    <pre></pre>
-                    Allow higher test accuracy methods:
-                    <label for="option">*This task will take a while to accomplish</label>
-                    <input type="checkbox" id="option" name="option">
-
-                    <pre></pre>
-                    <button name="test" class="btn btn-primary" style="margin-left:auto;margin-right:auto"
-                            onclick="location.href='{% url 'test' %}' ">test
-                    </button>
-                </form>
-
-            </div>-->
-
         </div>
     </div>
     <div class="row">
         <div class="col-md-6" style="margin: 0 auto;"></div>
     </div>
 </div>
+
 
 <div class="container-fluid">
     <div class="row">

@@ -33,16 +33,44 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import json
 
+
 ##---------------------------------------------------------------------------------------------------------
-from .models import Carousel
+# from .models import Carousel
 
 
-def compare_img(imgA, imgB):
-    s = ssim(imgA, imgB)  # comparison with structural similarity index
+def compare_img(image, template, template2, tH, tW):
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = cv2.resize(image, (500, 500))
+    found = None
+    for scale in np.linspace(0.2, 1.0, 45)[::-1]:
+        resized = imutils.resize(image, width=int(image.shape[1] * scale))
+        r = image.shape[1] / float(resized.shape[1])
+        if resized.shape[0] < tH or resized.shape[1] < tW:
+            break
+        edged = cv2.Canny(resized, 100, 150)  # The 2 numbers behind is the lower, upper threshold of our edge.
+        result = cv2.matchTemplate(edged, template, cv2.TM_CCOEFF)
+        (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
+        if found is None or maxVal > found[0]:
+            found = (maxVal, maxLoc, r)
+    (_, maxLoc, r) = found
+    (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
+    (endX, endY) = (int((maxLoc[0] + tW) * r), int((maxLoc[1] + tH) * r))
+
+    resizedTemplate = cv2.resize(template2, (endX - startX, endY - startY), interpolation=cv2.INTER_AREA)
+    roi = image[startY:endY, startX:endX]
+    image[startY:endY, startX:endX] = roi
+    s = ssim(resizedTemplate, roi)  # comparison with structural similarity index
     # y.TPic = imgA  Uncomment these if you want to see the comparison
     # y.Memeroi = imgB  Uncomment these if you want to see the comparison
     return s
 
+
+# def compare_img(imgA, imgB, y):
+#     s = ssim(imgA, imgB)  # comparison with structural similarity index
+#     y.MostSim = s
+#     #y.TPic = imgA  Uncomment these if you want to see the comparison
+#     #y.Memeroi = imgB  Uncomment these if you want to see the comparison
+#     return y
 ##---------------------------------------------------------------------------------------------------------
 def BDcheck(url):
     if "gif" not in url:  # Check type of image
@@ -54,8 +82,10 @@ def BDcheck(url):
         bpp = 0
     return bpp
 
+
 ##---------------------------------------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 ##---------------------------------------------------------------------------------------------------------
 def Regression(postNumPerDay):
@@ -69,7 +99,8 @@ def Regression(postNumPerDay):
             x += 1
             SUMy, SUMx2, SUMxy = SUMy + y, SUMx2 + (x * x), SUMxy + x * y
             i = i + 3
-        b = (n * SUMxy - (SUMx * SUMy)) / (n * SUMx2 - (SUMx * SUMx))
+        b = n * SUMxy - (SUMx * SUMy)
+        b = b / (n * SUMx2 - (SUMx * SUMx))
     except:
         b = 1.0
     print("b", b)
@@ -77,46 +108,54 @@ def Regression(postNumPerDay):
     print("slope", slope)
     return slope  # P
 
+
 ##---------------------------------------------------------------------------------------------------------
 def CalInfectRecoveryRate(UpDown, PostNumPerDays):  # PostNumPerDays = [day1, 100, num of posts]
-    x = 0  # Infectionrate
-    y = 0  # Recoveryrate
-    i, n = 2, len(PostNumPerDays) / 3
+    x, y, i = 0, 0, 2  # Infectionrate #Recoveryrate
     print("post per num", PostNumPerDays)
-    while i < len(PostNumPerDays):  # Calculate infection rate using the combined number similar posts over 100 over n days
-        x = x + int(PostNumPerDays[i]) / int(PostNumPerDays[i - 1])  # Number of meme posts over all posts
-        i = i + 3
+    n = len(PostNumPerDays) / 3
+    if n != 0:
+        while i < len(
+                PostNumPerDays):  # Calculate infection rate using the combined number similar posts over 100 over n days
+            x = x + int(PostNumPerDays[i]) / int(PostNumPerDays[i - 1])  # Number of meme posts over all posts
+            # print(x)
+            i = i + 3
+        x = x / n
 
-    x, i, n = x/n, 0, 0
-    while i < len(UpDown):  # Calculate recovery rate using the combined number of downvote percentage over similar posts
-        ########################
-        # divide = UpDown[i] + UpDown[i+1]
-        # if divide == 0:
-        #     divide = 1
-        # x = x + UpDown[i]/divide
-        # y = y + UpDown[i+1]/divide
-        #######################
-        # print("The types", type(UpDown[i]), type(UpDown[i+1]))
-        if int(UpDown[i + 1]) > int(UpDown[i]) / 4:  # If downvote is higher than quarter percentile of upvote
-            n += 1
-            if int(UpDown[i]) == 0:
-                UpDown[i] = 1
-            y = y + int(UpDown[i + 1]) / int(UpDown[i])
-        i += 2
+        i, n = 0, 0
+        while i < len(
+                UpDown):  # Calculate recovery rate using the combined number of downvote percentage over similar posts
+            ########################
+            # divide = UpDown[i] + UpDown[i+1]
+            # if divide == 0:
+            #     divide = 1
+            # x = x + UpDown[i]/divide
+            # y = y + UpDown[i+1]/divide
+            #######################
+            # print("The types", type(UpDown[i]), type(UpDown[i+1]))
+            if int(UpDown[i + 1]) > int(UpDown[i]) / 4:  # If downvote is higher than quarter percentile of upvote
+                # print("less than 1/4")
+                n += 1
+                if int(UpDown[i]) == 0:
+                    UpDown[i] = 1
+                y = y + int(UpDown[i + 1]) / int(UpDown[i])
+            i += 2
 
-    if n == 0:  # Thre's no instance of posts with less than 1/4 downvote rate.
-        y = 0.1
+        if n == 0:  # Thre's no instance of posts with less than 1/4 downvote rate.
+            y = 0.1
+        else:
+            y = y / n
     else:
-        y = y / n
+        print("some files are missing")
     print("x, y", x, y)
     return x, y
+
 
 ##---------------------------------------------------------------------------------------------------------
 def Calsir(postNumPerDay):
     I0 = postNumPerDay[len(postNumPerDay) - 1]
     S0 = postNumPerDay[len(postNumPerDay) - 2] - I0
-    R0 = 0
-    i, MaxNum = 1, 0
+    R0, i, MaxNum = 0, 1, 0
     while i < len(postNumPerDay):
         if postNumPerDay[i] > MaxNum:
             MaxNum = postNumPerDay[i]
@@ -126,6 +165,7 @@ def Calsir(postNumPerDay):
     n = S0 + I0 + R0
     return n, S0, I0, R0
 
+
 ##---------------------------------------------------------------------------------------------------------
 def deriv(y, t, N, beta, gamma):
     S, I, R = y
@@ -134,26 +174,48 @@ def deriv(y, t, N, beta, gamma):
     dRdt = gamma * I
     return dSdt, dIdt, dRdt
 
+
 ##---------------------------------------------------------------------------------------------------------
-def informative(I, input_days):
-    maxI, pos, once, plus, day = 0, [0, -1], True, (120 / input_days) - 1, 1  # [pos_maxI, pos_start of I less than 0.2]
+def informative(S, I, input_days, beta, gamma, ):
+    maxI, once, risepos = 0, True, [0, -1]  # [pos_maxI, pos_start of I less than 0.2]
+    # Finding the day I grows fast. -------------------------------------------------
+    plus, day = (120 / input_days) - 1, 1
     for i in range(len(I)):
         if i % plus == 0 and i != 0:
             day += 1
         if maxI < I[i]:  # Finding the point where the maximum infected cases is presented
-            pos[0], maxI = day / 2, I[i]
+            risepos[0] = day / 2
+            maxI = I[i]
+            # print("new popularity height = ", maxI)
         if I[i] < 0.2 and once:  # might need to change this number at some point
-            pos[1], once = day, False
-    # i = plus
-    # day = 1
-    # while i <= len(I):
-    #     if pos[0] <= i:
-    #         pos[0] = day
-    #     if pos[1] <= i:
-    #         pos[1] = day
-    #     i = i + plus
-    #     day += 1
-    return pos
+            risepos[1] = day
+            once = False
+    # The ratio between Beta and Gamma and what that means. ---------------------------
+    ratio, description, description2 = beta / gamma, "", ""
+    if ratio <= 0.5:
+        description = "The meme is long dead."
+    elif ratio <= 2:
+        description = "The meme format is and will not become popular."
+    elif ratio <= 4:
+        description = "The meme format is and will likely to remain a low constant in popularity."
+    elif ratio <= 6:
+        description = "The meme has seen substantial usage and may have chance of becoming popular."
+    elif ratio > 6:
+        description = "The meme format is and will become popular."
+    # The ratio between initial susceptible cases and infected cases.
+    avgI, avgS = 0, 0
+    for i in S:
+        avgS = avgS + i
+    avgS = avgS/len(S)
+    for i in I:
+        avgI = avgI + i
+    avgI = avgI / len(I)
+    if avgI/avgS <= 0.5:
+        description2 = "This meme was not being used much by the subreddit"
+    elif avgI/avgS > 0.5:
+        description2 = "This meme was popular in the subreddit"
+    return risepos, description, description2
+
 
 ##---------------------------------------------------------------------------------------------------------
 def plot_data(postNumPerDay):
@@ -168,23 +230,24 @@ def plot_data(postNumPerDay):
     ax.plot(t, num)
     ax.set_xlabel('days')
     ax.set_ylabel('posts with detected meme format')
-    # ax.yaxis.set_tick_params(length=0)
-    # ax.xaxis.set_tick_params(length=0)
     ax.grid(b=True, which='major', c='w', lw=5, ls='-')
     img_path = os.path.join(BASE_DIR, "static/data.jpg")
     plt.savefig(img_path)
 
+
 ##---------------------------------------------------------------------------------------------------------
-def readjson(year, month, day, date_back):
-    date_list, i = [], 0  # Store all dates leading to the current date   ['-day-month-year', '-da.....]
+def readjson(year, month, day, date_back, subreddit):
+    date_list = []  # Store all dates leading to the current date   ['-day-month-year', '-da.....]
+    print("DATE", day, month, year)
+    i = 0
     while i < date_back:  # Including the first day. so if starts from 1 scrape for 2 days then [1, 2]
-        # current_date = datetime.today() - timedelta(days=date_back)
         if i == 0:
             current_date = datetime(year, month, day, 00, 00, 00)
         else:
             current_date = datetime(year, month, day, 00, 00, 00) + timedelta(days=i)
         current_date = str(current_date).split("-")
-        fodder = current_date[2][:2]
+        fodder = current_date[2]
+        fodder = fodder[:2]
         start_date = "-" + "00" + "-" + fodder + "-" + current_date[1] + "-" + current_date[0] + ".json"
         date_list.append(start_date)
         start_date = "-" + "12" + "-" + fodder + "-" + current_date[1] + "-" + current_date[0] + ".json"
@@ -195,33 +258,49 @@ def readjson(year, month, day, date_back):
     # #############################################################################
     class Rpost:
         url, MostSim, up, down = "", 0.0, 0, 0
-    x = Rpost()
-    # #############################################################################
-    Posts = []
-    for i in date_list:
-        with open('/home/oem/Desktop/crontabProj/json/post' + i) as file:
-            data = json.load(file)
-        count = 0
-        for q in data:
-            count += 1
-            arr = str(q).split(",")
-            x.up, x.down = arr[0][7:], arr[1][9:]
-            if count < len(data):
-                x.url = arr[9:-2]
-            else:
-                x.url = arr[9:-3]
-            Posts.append(x)  # 100 posts per json(smaller loop) upto date_back number of days(bigger loop)
 
-    return Posts
+    Posts, URLarray = [], []
+    for i in date_list:
+        Jpost = "post" + i
+        try:
+            with open('C:/Users/psyon/Desktop/test/json/' + subreddit + "/" + Jpost) as file:
+                data = json.load(file)
+            print("name == /home/oem/Desktop/crontabProj/json/" + subreddit + "/" + Jpost)
+            data = json.dumps(data)
+            data = data.split("{")
+            data.pop(0)  # removes the first array box that only contains the "["
+            count = 0
+            for i in data:
+                x = Rpost()
+                count += 1
+                arr = i.split(",")
+                x.up = arr[0][6:]
+                x.down = arr[1][9:]
+                url = arr[3]
+                if count < len(data):
+                    x.url = url[9:-2]
+                else:
+                    x.url = url[9:-3]
+                URLarray.append(x.url)
+                Posts.append(x)  # 100 posts per json(smaller loop) upto date_back number of days(bigger loop)
+        except:
+            nothing = 0
+
+    return Posts, URLarray
+
+
 ##---------------------------------------------------------------------------------------------------------
-def scale(Posts, original, percentage):     #Scale the image down and calculates the similarity between them
+def scale(Posts, original, percentage):
     template = original
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     template = cv2.resize(template, (250, 250))
     template2 = template.copy()
     template = cv2.Canny(template, 100, 150)
     (tH, tW) = template.shape[:2]
-    count_day, day_count, results, num, postNumPerDay, UpDown = 0, 0, [], 0, [], []  # For every 100 we cut to the next day
+
+    count_day = 0  # For every 100 we cut to the next day
+    day_count = 0  # It gives the day value in the array
+    results, num, postNumPerDay, UpDown = [], 0, [], []
     for post in Posts:
         count_day += 1
         addin, bpp = True, 0
@@ -229,37 +308,19 @@ def scale(Posts, original, percentage):     #Scale the image down and calculates
             bpp = BDcheck(post.url)  # bit depth of picture
         except:
             addin = False
-        if "gif" in post.url:
+        if "gif" in post.url or bpp != 24:
             addin = False
-        if bpp != 24:  # check Is it 24?
+        try:
+            image = imread(post.url)
+        except:
             addin = False
         if addin:
             # template = original
             image = imread(post.url)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            image = cv2.resize(image, (500, 500))
-            found = None
-            for scale in np.linspace(0.2, 1.0, 45)[::-1]:
-                resized = imutils.resize(image, width=int(image.shape[1] * scale))
-                r = image.shape[1] / float(resized.shape[1])
-                if resized.shape[0] < tH or resized.shape[1] < tW:
-                    break
-                edged = cv2.Canny(resized, 100, 150)  # The 2 numbers behind is the lower, upper threshold of our edge.
-                result = cv2.matchTemplate(edged, template, cv2.TM_CCOEFF)
-                (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
-                if found is None or maxVal > found[0]:
-                    found = (maxVal, maxLoc, r)
-            (_, maxLoc, r) = found
-            (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
-            (endX, endY) = (int((maxLoc[0] + tW) * r), int((maxLoc[1] + tH) * r))
-
-            resizedTemplate = cv2.resize(template2, (endX - startX, endY - startY), interpolation=cv2.INTER_AREA)
-            roi = image[startY:endY, startX:endX]
-            image[startY:endY, startX:endX] = roi
-            post.MostSim = compare_img(resizedTemplate, roi)
+            post.MostSim = compare_img(image, template, template2, tH, tW)
 
         if addin and post.MostSim > percentage:
-            print("Most sim and percentage", post.MostSim, percentage)
+            # print("Most sim and percentage",post.MostSim, percentage)
             results.append(post)
             UpDown.append(post.up)
             UpDown.append(post.down)
@@ -273,12 +334,17 @@ def scale(Posts, original, percentage):     #Scale the image down and calculates
             count_day = 0  # set number of days so it'll reach 100 again
 
     return results, postNumPerDay, UpDown
+
+
 ##---------------------------------------------------------------------------------------------------------
 def mathmatical(UpDown, postNumPerDay):
     beta, gamma = CalInfectRecoveryRate(UpDown, postNumPerDay)
     N, S0, I0, R0 = Calsir(postNumPerDay)
     t = np.linspace(0, 7, 160)  # int(len(postNumPerDay) / 3)
     y0 = [S0, I0, R0]  # Initial conditions vector
+    print("initail number of cases", y0)
+    print("infectionR, recovR", round(beta, 3), round(gamma, 3))
+    print("time", t[:2])
     ret = odeint(deriv, y0, t, args=(N, beta, gamma))  # Integrate the SIR equations over the time grid, t.
     S, I, R = ret.T
 
@@ -288,7 +354,7 @@ def mathmatical(UpDown, postNumPerDay):
     ax.plot(t, I / N, 'r', alpha=0.5, lw=2, label='meme creators')
     ax.plot(t, R / N, 'g', alpha=0.5, lw=2, label='bored meme creators')
     ax.set_xlabel('Time /days')
-    ax.set_ylabel('Number of posts (In %)')
+    ax.set_ylabel('Percentage of cases')
     ax.set_ylim(0, 1.0)
     ax.set_xlim(0, 7)  #
     ax.yaxis.set_tick_params(length=0)
@@ -302,33 +368,46 @@ def mathmatical(UpDown, postNumPerDay):
     plt.savefig(img_path, bbox_inches="tight")
 
     return S, I, R, beta, gamma
-##---------------------------------------------------------------------------------------------------------
-def popular_prediction(request):
-    percentage, date_back, current_date = 0.1, 7, str(datetime.today())
+
+
+def popular_prediction(request, subreddit):
+    percentage, date_back = 0.1, 7
+    current_date = str(datetime.today())
     current_date = current_date.split("-")
-    current_date[2] = int(current_date[2][:2])
-    current = "pop-00-" + current_date[0] + "-" + current_date[1] + "-" + current_date[2] + ".json"
-    with open('/Users/psyon/Desktop/crontabProj/json/' + current) as file:  # Open the first link in the pop-.... to set as the template
+    year, month, day = int(current_date[0]), int(current_date[1]), current_date[2]
+    day = int(day[:2])
+    # print(year, month, day)
+    current = "pop-00-" + day + "-" + month + "-" + year + ".json"
+    with open(
+            '/Users/psyon/Desktop/crontabProj/json/' + current) as file:  # Open the first link in the pop-.... to set as the template
         data = json.load(file)
     data = json.dumps(data)
     data = data.split("{")
     data.pop(0)  # removes the first array box that only contains the "["
+
     url = data[0][9:-3]
     original = cv2.imread(url)  #########################not sure if this works or not ususally it's just imread()
     #############################################################################
-    Posts = readjson(current_date[0], current_date[1], current_date[2], date_back)  # read the database and retrieve the stored info
+
+    # ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    Posts, URLarray = readjson(year, month, day, date_back, subreddit)  # read the database and retrieve the stored info
     results, postNumPerDay, UpDown = scale(Posts, original, percentage)  # The picture comparison part
+
     plot_data(postNumPerDay)  # Set up the scale of the graph
     S, I, R, beta, gamma = mathmatical(UpDown, postNumPerDay)  # The graph part
-    pos = informative(I, date_back)
-    date_back = current_date[2] + date_back
+    # ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    pos, date_back = informative(I, date_back), day + date_back
     return render(request, 'output.html',
-                  {"results": results, "year": current_date[0], "month": current_date[1], "day": current_date[2], "days": date_back, "sim": percentage,
+                  {"results": results, "year": year, "month": month, "day": day, "days": date_back,
+                   "sim": round(percentage, 3),
                    "maxI": pos[0], "trend_over": pos[1]
-                      , "slope": beta, "recov": gamma})
-##---------------------------------------------------------------------------------------------------------
+                      , "slope": round(beta, 3), "recov": round(gamma, 3)})
+
+
 def scrape(request):
     #############################################################################
+    date_back = 1
     date = str(request.POST.get('input_date'))
     dateArr = date.split("-")
     uploaded_img = Image.open(request.FILES['image'])
@@ -338,45 +417,78 @@ def scrape(request):
     try:
         date_back = int(request.POST.get('input_days'))
         year, month, day = int(dateArr[0]), int(dateArr[1]), int(dateArr[2])
-        percentage = float(request.POST.get('percent')) / 100.0
+        percentage = request.POST.get('percent')
+        percentage = float(percentage) / 100.0
+        subreddit = request.POST.get('subreddit')
         uploaded_img.save(img_path)
     except:
         return render(request, 'error.html')
-    ############################################################################
     original = cv2.imread(img_path)  # This value is the img used to compare
+    #############################################################################
+
     # ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    Posts = readjson(year, month, day, date_back)  # read the database and retrieve the stored info
+    Posts, URLarray = readjson(year, month, day, date_back, subreddit)  # read the database and retrieve the stored info
     results, postNumPerDay, UpDown = scale(Posts, original, percentage)  # The picture comparison part
+    # ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
     # ///////////////////////////////////////////////////////////////////////////////////////////////////////
     plot_data(postNumPerDay)  # Set up the scale of the graph
     S, I, R, beta, gamma = mathmatical(UpDown, postNumPerDay)  # The graph part
     # ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    pos, date_back = informative(I, date_back), day + date_back
+    ##-------------------------------------------------------------------------
+    pos, decription = informative(S, I, date_back, beta, gamma)
+    date_back = day + date_back
     return render(request, 'output.html',
                   {"results": results, "year": year, "month": month, "day": day, "days": date_back, "sim": percentage,
                    "maxI": pos[0], "trend_over": pos[1]
-                      , "slope": beta, "recov": gamma})
-##---------------------------------------------------------------------------------------------------------
+                      , "slope": round(beta, 3), "recov": round(gamma, 3), "descrip": decription, "descrip2": decription2})
+
+
+def trial(request):
+    uploaded_img = Image.open(request.FILES['trial'])
+    img_path = os.path.join(BASE_DIR, "storeimg/2.jpg")
+    if uploaded_img.mode in ("RGBA", "P"):
+        uploaded_img = uploaded_img.convert("RGB")
+    try:
+        uploaded_img.save(img_path)
+    except:
+        return render(request, 'error.html')
+    template = cv2.imread(img_path)  # This value is the img used to compare
+    template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    template = cv2.resize(template, (250, 250))
+    template2 = template.copy()
+    template = cv2.Canny(template, 100, 150)
+    (tH, tW), sim = template.shape[:2], []
+    for i in range(5):
+        image = imread(os.path.join("C:/Users/psyon/Desktop/work/SPwebsite/sp/static", "trial" + str(i + 1) + ".jpg"))
+        sim.append(compare_img(image, template, template2, tH, tW))
+    return render(request, 'trial.html',
+                  {"results1": round(sim[0],3), "results2": round(sim[1],3), "results3": round(sim[2],3), "results4": round(sim[3],3), "results5": round(sim[4],3)})
+
+
 def index(request):
     form = ImageForm()
+    # return render(request, 'Home.html', {'form': form})
     return render(request, 'Home.html', {'form': form})
+    # return render(request, "index.html")
+
+
 def home(request):
     form = ImageForm()
     return render(request, 'Home.html', {'form': form})
+
+
 def today(request):
     form = ImageForm()
     return render(request, 'TodayMost.html', {'form': form})
+
+
 def analysis(request):
     form = ImageForm()
     return render(request, 'index.html', {'form': form})
-def HomeView(request):
-    obj = Carousel.objects.all()
-    context = {
-        'obj': obj
-    }
-    return render(request, 'Home.html', context)
-##---------------------------------------------------------------------------------------------------------
+
+
+# ##---------------------------------------------------------------------------------------------------------
 def submitquery(request):
     q = request.POST.get['query', False]
     try:
@@ -389,7 +501,9 @@ def submitquery(request):
         return render(request, 'index.html', context=mydict)
     except:
         pass
-##---------------------------------------------------------------------------------------------------------
+
+
+# ##---------------------------------------------------------------------------------------------------------
 def test(request):
     date = str(request.POST.get('idate'))
     days = request.POST.get('idays')
@@ -407,16 +521,25 @@ def test(request):
     days = int(days) + day
     # 2017, 6, 29, 00, 00, 00
     return render(request, 'output.html', {"results": per, "year": year, "month": month, "day": day, "days": days})
-##---------------------------------------------------------------------------------------------------------
+
+
+# ##---------------------------------------------------------------------------------------------------------
 def image_upload_view(request):  # process img uploaded by users
     if request.method == 'POST':
         uploaded_img = Image.open(request.FILES['image'])
+        # img_path = 'C:/Users/jade/PycharmProjects/pythonProject/SPwebsite/sp/storeimg/1.jpg'
         img_path = os.path.join(BASE_DIR, "storeimg/1.jpg")
         uploaded_img.save(img_path)
+        original = cv2.imread(img_path)  # This value is the img used to compare
         return render(request, 'index.html', {'img_obj': img_path})
+        #     return render(request, 'index.html', {'form': form, 'img_obj': img_obj})
     else:  # essentially saying request.method==GET, meaning that we're request seeign the img
         form = ImageForm()
     return render(request, 'index.html', {'form': form})
+
+
 ##---------------------------------------------------------------------------------------------------------
+
 def try_this(request):
     return render(request, 'output.html')
+# //////////////////////////////////

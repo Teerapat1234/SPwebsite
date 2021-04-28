@@ -1,23 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-<!--        <link rel="stylesheet" href="css.css">-->
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-              integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    
-        <title>error</title>
-    </head>
-<body>
+<meta charset = "UTF-8">
+<meta name = " viewport" content = "width = device-width, initial-scale = 1">
+<link rel = "stylesheet" href = "https://www.w3schools.com/w3css/4/w3.css">
+<link rel = "stylesheet" href = "https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+	body{
+		max-height: 70%;
+		overflow-y: auto;
+	}
+	img.hover-shadow{
+		transition: 0.3s;
+	}
+	.hover-shadow:hover{
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	}
+	.center {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		width: 50%;
+	}
+</style>
+<body class = "w3-theme-black" id = "today">
+	<!-- nav bar -->
+	<div class="w3-top" id = "navbar">
+		<div class="w3-bar w3-theme-d2 w3-left-align">
+		<!--<a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-hover-white w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>-->
+		<a href = "{% url 'home' %}" class="w3-bar-item w3-button w3-yellow"><i class="fa fa-home w3-margin-right"></i>Meme Scraper</a>
+
+		<div id="nav">
+            <div><a href="{% url 'today' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Today's Most Popular Meme Analysis</a></div>
+        	<div><a href="{% url 'analysis' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Meme Analysis</a></div>
+		</div>
+
+		</div>
+		<!--<a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-hover-teal" title="Search"><i class="fa fa-search"></i></a>-->
+
     <div style="text-align:center; margin-top: 250px">
         <h1>404 error</h1>
     </div>
     <div style="margin-left: 180px; margin-top: 40px">
         <h3>Either there's something wrong with the server or your submitted template can not be used.</h3>
+    </div>
     </div>
 </body>
 </html>
