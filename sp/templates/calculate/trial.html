@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<meta charset = "UTF-8">
+<meta name = " viewport" content = "width = device-width, initial-scale = 1">
+<link rel = "stylesheet" href = "https://www.w3schools.com/w3css/4/w3.css">
+<link rel = "stylesheet" href = "https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+	body{
+		width: 100%;
+		height: 100%;
+		overflow-y: auto;
+	}
+	img.hover-shadow{
+		transition: 0.3s;
+	}
+	.hover-shadow:hover{
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	}
+	.center {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		width: 50%;
+	}
+</style>
+<title>similarity adjustment</title>
+<body class = "w3-theme-black" id = "trial">
+	<!-- nav bar -->
+	<div class="w3-top" id = "navbar">
+		<div class="w3-bar w3-theme-d2 w3-left-align">
+		<!--<a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-hover-white w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>-->
+		<a href = "{% url 'home' %}" class="w3-bar-item w3-button w3-yellow"><i class="fa fa-home w3-margin-right"></i>Meme Scraper</a>
+		<div id="nav">
+            <div><a href="{% url 'today' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Today's Most Popular Meme</a></div>
+        	<div><a href="{% url 'analysis' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Meme Analysis</a></div>
+		</div>
+		</div>
+		<!--<a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-hover-teal" title="Search"><i class="fa fa-search"></i></a>-->
+	</div>
+
+    <!--<img class="img-fluid" style="margin-left: 180px; margin-top: 5px" src="{% static 'data.jpg' %}">-->
+    <div style="margin-top: 30px" class="w3-container w3-padding-15 w3-gray" id="greybar1">
+        <h1 style="margin-top: 15px; margin-bottom: 15px" align = "center"> Below are the similarity scores after each comparison between posts from the selected date.</h1>
+    </div>
+    <div class="column" style="margin-top:50px; margin-bottom:100px; margin-left:500px">
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial1.jpg' %}" class = "hover-shadow">Similarity score: {{ results1 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial2.jpg' %}" class = "hover-shadow">Similarity score: {{ results2 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial3.jpg' %}" class = "hover-shadow">Similarity score: {{ results3 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial4.jpg' %}" class = "hover-shadow">Similarity score: {{ results4 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial5.jpg' %}" class = "hover-shadow">Similarity score: {{ results5 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial6.jpg' %}" class = "hover-shadow">Similarity score: {{ results6 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial7.jpg' %}" class = "hover-shadow">Similarity score: {{ results7 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial8.jpg' %}" class = "hover-shadow">Similarity score: {{ results8 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial9.jpg' %}" class = "hover-shadow">Similarity score: {{ results9 }}</a>
+        </div><br><br>
+        <div class="row" style ="padding-left: 100px">
+            <a href="#"><img style="max-width:200px; max-height:200px align:center; margin-top: 10px" src="{% static 'trial10.jpg' %}" class = "hover-shadow">Similarity score: {{ results10 }}</a>
+        </div>
+    </div>
+
+<!--<footer class="w3-container w3-padding-32 w3-theme-d1 w3-center">-->
+<!--    <div style="color: white; margin-top: 10px">-->
+<!--        <p>Brought to you by: a truly directionless group of inexperienced programmers </p>-->
+<!--        <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>-->
+<!--    </div>-->
+<!--</footer>-->
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html xmlns:width="http://www.w3.org/1999/xhtml" xmlns:max-width="http://www.w3.org/1999/xhtml">
+<title> Meme Scraper </title>
+<meta charset = "UTF-8">
+<meta name = " viewport" content = "width = device-width, initial-scale = 1">
+<link rel = "stylesheet" href = "https://www.w3schools.com/w3css/4/w3.css">
+<link rel = "stylesheet" href = "https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+	body{
+		max-height: 70%;
+		overflow-y: auto;
+	}
+	img.hover-shadow{
+		transition: 0.3s;
+	}
+	.hover-shadow:hover{
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	}
+	.center {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		width: 50%;
+	}
+</style>
+
+<body class = "w3-theme-black" id = "Home">
+	<!-- nav bar -->
+	<div class="w3-top" id = "navbar">
+		<div class="w3-bar w3-theme-d2 w3-left-align">
+		<!--<a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-hover-white w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>-->
+		<a href = "{% url 'home' %}" class="w3-bar-item w3-button w3-yellow"><i class="fa fa-home w3-margin-right"></i>Meme Scraper</a>
+
+		<div id="nav">
+            <div><a href="{% url 'today' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Today's Most Popular Meme</a></div>
+        	<div><a href="{% url 'analysis' %}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Meme Analysis</a></div>
+		</div>
+
+<!--		<form action="{% url 'today'%}" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Today's Most Popular Meme Analysis</form>-->
+
+<!--		<a href="#contact" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Contact</a>-->
+			<!--<div class="w3-dropdown-hover w3-hide-small">
+			<button class="w3-button" title="Notifications">Dropdown <i class="fa fa-caret-down"></i></button>
+				<div class="w3-dropdown-content w3-card-4 w3-bar-block">
+				<a href="#" class="w3-bar-item w3-button">Link</a>
+				<a href="#" class="w3-bar-item w3-button">Link</a>
+				<a href="#" class="w3-bar-item w3-button">Link</a>
+				</div>-->
+		</div>
+		<!--<a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-hover-teal" title="Search"><i class="fa fa-search"></i></a>-->
+	</div>
+	<br>
+	<!--logo-->
+	<div class = "w3-display-container w3-content w3-wide" style="max-width:1500px">
+		<img class = "w3-image" style="width:1500px;max-height:650px" src="{% static 'bg1.png' %}">
+		<div class="w3-display-middle w3-margin-top w3-center">
+			<a href="#"><img style="max-width:400px; max-height:400px align:center" src="{% static 'bg2.png' %}" class = "hover-shadow"></a>
+		</div>
+	</div>
+	</br>
+	<!--Graph-->
+	<div class = "w3-container">
+			<h1 class="w3-border-bottom w3-border-light-grey w3-padding-16" align = "center"> List of today's most popular meme</h1>
+		<div class = "w3-card-4 center" style = "width:350px;height:400px">
+			<a href="{% url 'today' %}"><img class="img-fluid" style = "max-width:350px;max-height:400px; margin-top: 10px" class = "hover-shadow" src="{% static 'p1.jpg' %}"></a>
+<!--			<a href = "Today's Most.html"><img src="SIR graph.jpg" style = "max-width:350px;max-height:400px" class = "hover-shadow"></a>-->
+		</div>
+	</div>
+	<!--<div class = "row" style = "margin:0 -5px">
+		<div class = "column" style = "float: left; width:25%; padding:0 10px">
+			<div class = "card w3-hover-shadow">
+				<img src="SIR graph.jpg" style = "max-width:350px;max-height:400px">
+			</div>
+		</div>
+		<div class = "column" style = "float: left; width:25%; padding:0 10px">
+			<div class = "card w3-hover-shadow">
+				<img src="SIR graph2.jpg" style = "max-width:350px;max-height:400px">
+			</div>
+		</div>
+		<div class = "column" style = "float: left; width:25%; padding:0 10px">
+			<div class = "card w3-hover-shadow">
+				<img src="SIR graph3.jpg" style = "max-width:350px;max-height:400px">
+			</div>
+		</div>
+		<div class = "column" style = "float: left; width:25%; padding:0 10px">
+			<div class = "card w3-hover-shadow">
+				<img src="SIR graph4.jpg" style = "max-width:350px;max-height:400px">
+			</div>
+		</div>
+	</div>-->
+
+	<!-- Contact Container -->
+	<!--<div class="w3-container w3-padding-64" id="contact">
+		<h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Contact Us</h3>
+		  <form class="w3-container w3-card-4 w3-padding-16 w3-white" action="/action_page.php" target="_blank">
+		  <div class="w3-section">
+			<label>Name</label>
+			<input class="w3-input" type="text" name="Name" required>
+		  </div>
+		  <div class="w3-section">
+			<label>Email</label>
+			<input class="w3-input" type="text" name="Email" required>
+		  </div>
+		  <div class="w3-section">
+			<label>Message</label>
+			<input class="w3-input" type="text" name="Message" required>
+		  </div>
+		  <input class="w3-check" type="checkbox" checked name="Like">
+		  <label>I Like it!</label>
+		  <button type="submit" class="w3-button w3-right w3-theme">Send</button>
+		  </form>
+		</div>
+	  </div>
+	</div>-->
+	<footer class="w3-container w3-padding-32 w3-theme-d1 w3-center">
+		<div style="color: white;">
+			<p>Brought to you by: a truly directionless group of inexperienced programmers </p>
+			<p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+		</div>
+	</footer>
+</body>
+
+
+
+<script>
+
+</script>
+
+</html>

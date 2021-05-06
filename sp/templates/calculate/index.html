@@ -49,7 +49,7 @@
 	</div>
 <div style="margin-top: 30px" class="w3-container w3-padding-15 w3-gray" id="greybarindex">
 	<h2 style="margin-top: 15px; margin-bottom: 15px" align = "center"> In case you wonder what the similarity standard of your template should be,
-                    please use this box to compare your format to our 5 arbitrarily selected formats.</h2>
+                    please use this box to compare your format to the first 10 posts from this date.</h2>
 </div>
 
 <div class="container-fluid" style="margin-bottom: 5rem; margin-top: 80px">
@@ -60,6 +60,16 @@
                 </form>
                 <form method="POST" enctype="multipart/form-data" action="{% url 'trial'%}">
                     Upload your format here.
+                    <pre></pre>
+                    Please input the first date of scraping:
+                    <input type="date" id="input_date_trial" name="input_date_trial">
+                    <pre></pre>
+                    Please choose the subreddit you want to compare with:
+                    <select name="subreddit_trial" id="subreddit_trial">
+                      <option value="dankmemes">dankmemes</option>
+                      <option value="memes">memes</option>
+                      <option value="funny">funny</option>
+                    </select>
                     <pre></pre>
                     Please choose a picture as your meme template:
                     <input type="file" name="trial">
