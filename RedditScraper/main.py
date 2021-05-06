@@ -102,10 +102,10 @@ def scrape():
         class post:
             up, down, time, url, check = 0, 0, 0, "", True  # This will be used to test whether this particular post already have similar img to other posts.
 
-        reddit = praw.Reddit(client_id="ByFeBxzm-VNXVw",
-                             username="LukeKunG",
-                             client_secret="uBuaT8KB5nH4RfxFzaZ-WeafRSE",
-                             user_agent="Senior")
+        reddit = praw.Reddit(client_id="",
+                             username="",
+                             client_secret="",
+                             user_agent="")
         subname = ""
         if run == 0:
             subname = "dankmemes"
