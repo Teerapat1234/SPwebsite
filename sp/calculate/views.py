@@ -191,17 +191,17 @@ def informative(S, I, input_days, beta, gamma, ):
             risepos[1] = day
             once = False
     # The ratio between Beta and Gamma and what that means. ---------------------------
-    ratio, description, description2 = beta / gamma, "", ""
+    ratio, description = beta / gamma, ["", ""]
     if ratio <= 0.5:
-        description = "The meme is long dead."
+        description[0] = "The meme is long dead."
     elif ratio <= 2:
-        description = "The meme format is and will not become popular."
+        description[0] = "The meme format is and will not become popular."
     elif ratio <= 4:
-        description = "The meme format is and will likely to remain a low constant in popularity."
+        description[0] = "The meme format is and will likely to remain a low constant in popularity."
     elif ratio <= 6:
-        description = "The meme has seen substantial usage and may have chance of becoming popular."
+        description[0] = "The meme has seen substantial usage and may have chance of becoming popular."
     elif ratio > 6:
-        description = "The meme format is and will become popular."
+        description[0] = "The meme format is and will become popular."
     # The ratio between initial susceptible cases and infected cases.
     avgI, avgS = 0, 0
     for i in S:
@@ -211,10 +211,10 @@ def informative(S, I, input_days, beta, gamma, ):
         avgI = avgI + i
     avgI = avgI / len(I)
     if avgI/avgS <= 0.5:
-        description2 = "This meme was not being used much by the subreddit"
+        description[1] = "This meme was not being used much by the subreddit"
     elif avgI/avgS > 0.5:
-        description2 = "This meme was popular in the subreddit"
-    return risepos, description, description2
+        description[1] = "This meme was popular in the subreddit"
+    return risepos, description
 
 
 ##---------------------------------------------------------------------------------------------------------
@@ -441,7 +441,7 @@ def scrape(request):
     return render(request, 'output.html',
                   {"results": results, "year": year, "month": month, "day": day, "days": date_back, "sim": percentage,
                    "maxI": pos[0], "trend_over": pos[1]
-                      , "slope": round(beta, 3), "recov": round(gamma, 3), "descrip": decription, "descrip2": decription2})
+                      , "slope": round(beta, 3), "recov": round(gamma, 3), "descrip": decription[0], "descrip2": decription[1]})
 
 
 def trial(request):
