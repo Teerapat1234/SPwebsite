@@ -191,17 +191,17 @@ def informative(S, I, input_days, beta, gamma, ):
             risepos[1] = day
             once = False
     # The ratio between Beta and Gamma and what that means. ---------------------------
-    ratio, description, description2 = beta / gamma, "", ""
+    ratio, description = beta / gamma, ["", ""]
     if ratio <= 0.5:
-        description = "The meme is long dead."
+        description[0] = "The meme is long dead."
     elif ratio <= 2:
-        description = "The meme format is and will not become popular."
+        description[0] = "The meme format is and will not become popular."
     elif ratio <= 4:
-        description = "The meme format is and will likely to remain a low constant in popularity."
+        description[0] = "The meme format is and will likely to remain a low constant in popularity."
     elif ratio <= 6:
-        description = "The meme has seen substantial usage and may have chance of becoming popular."
+        description[0] = "The meme has seen substantial usage and may have chance of becoming popular."
     elif ratio > 6:
-        description = "The meme format is and will become popular."
+        description[0] = "The meme format is and will become popular."
     # The ratio between initial susceptible cases and infected cases.
     avgI, avgS = 0, 0
     for i in S:
@@ -211,10 +211,10 @@ def informative(S, I, input_days, beta, gamma, ):
         avgI = avgI + i
     avgI = avgI / len(I)
     if avgI/avgS <= 0.5:
-        description2 = "This meme was not being used much by the subreddit"
+        description[1] = "This meme was not being used much by the subreddit"
     elif avgI/avgS > 0.5:
-        description2 = "This meme was popular in the subreddit"
-    return risepos, description, description2
+        description[1] = "This meme was popular in the subreddit"
+    return risepos, description
 
 
 ##---------------------------------------------------------------------------------------------------------
@@ -436,34 +436,50 @@ def scrape(request):
     S, I, R, beta, gamma = mathmatical(UpDown, postNumPerDay)  # The graph part
     # ///////////////////////////////////////////////////////////////////////////////////////////////////////
     ##-------------------------------------------------------------------------
-    pos, decription = informative(S, I, date_back, beta, gamma)
+    pos, description = informative(S, I, date_back, beta, gamma)
     date_back = day + date_back
     return render(request, 'output.html',
                   {"results": results, "year": year, "month": month, "day": day, "days": date_back, "sim": percentage,
                    "maxI": pos[0], "trend_over": pos[1]
-                      , "slope": round(beta, 3), "recov": round(gamma, 3), "descrip": decription, "descrip2": decription2})
+                      , "slope": round(beta, 3), "recov": round(gamma, 3), "descrip": description[0], "descrip2": description[1]})
 
 
 def trial(request):
-    uploaded_img = Image.open(request.FILES['trial'])
+    template = Image.open(request.FILES['trial'])
     img_path = os.path.join(BASE_DIR, "storeimg/2.jpg")
-    if uploaded_img.mode in ("RGBA", "P"):
-        uploaded_img = uploaded_img.convert("RGB")
-    try:
-        uploaded_img.save(img_path)
-    except:
-        return render(request, 'error.html')
-    template = cv2.imread(img_path)  # This value is the img used to compare
+    if template.mode in ("RGBA", "P"):
+        template = template.convert("RGB")
+    date = str(request.POST.get('input_date_trial'))
+    dateArr = date.split("-")
+    year, month, day = int(dateArr[0]), int(dateArr[1]), int(dateArr[2])
+    subreddit = request.POST.get('subreddit_trial')
+    Posts, URLarray = readjson(year, month, day, 1, subreddit)
+    template.save(img_path)
+    template = imread(img_path)
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     template = cv2.resize(template, (250, 250))
     template2 = template.copy()
     template = cv2.Canny(template, 100, 150)
-    (tH, tW), sim = template.shape[:2], []
-    for i in range(5):
-        image = imread(os.path.join("C:/Users/psyon/Desktop/work/SPwebsite/sp/static", "trial" + str(i + 1) + ".jpg"))
-        sim.append(compare_img(image, template, template2, tH, tW))
+    (tH, tW) = template.shape[:2]
+    count, sim = 0, []
+    for post in Posts:
+        if count == 10:
+            break
+        if ".jpg" in post.url:
+            bpp = 0
+            try:
+                image = imread(post.url)
+                bpp = BDcheck(post.url)  # bit depth of picture
+            except:
+                continue
+            if bpp != 24:
+                continue
+            count += 1
+            image = imread(post.url)
+            cv2.imwrite("C:/Users/psyon/Desktop/work/SPwebsite/sp/static/trial" + str(count) + ".jpg", image)
+            sim.append(compare_img(image, template, template2, tH, tW))
     return render(request, 'trial.html',
-                  {"results1": round(sim[0],3), "results2": round(sim[1],3), "results3": round(sim[2],3), "results4": round(sim[3],3), "results5": round(sim[4],3)})
+                  {"results1": round(sim[0],3), "results2": round(sim[1],3), "results3": round(sim[2],3), "results4": round(sim[3],3), "results5": round(sim[4],3), "results6": round(sim[5],3), "results7": round(sim[6],3), "results8": round(sim[7],3), "results9": round(sim[8],3),"results10": round(sim[9],3)})
 
 
 def index(request):
