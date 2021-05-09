@@ -340,7 +340,8 @@ def scale(Posts, original, percentage):
 def mathmatical(UpDown, postNumPerDay):
     beta, gamma = CalInfectRecoveryRate(UpDown, postNumPerDay)
     N, S0, I0, R0 = Calsir(postNumPerDay)
-    t = np.linspace(0, 7, 160)  # int(len(postNumPerDay) / 3)
+    # t = np.linspace(0, 7, 160)  # Number of days capped to 7, we can increase this number anytime.
+    t = np.linspace(0, len(postNumPerDay)/3, 160)
     y0 = [S0, I0, R0]  # Initial conditions vector
     print("initail number of cases", y0)
     print("infectionR, recovR", round(beta, 3), round(gamma, 3))
@@ -356,7 +357,8 @@ def mathmatical(UpDown, postNumPerDay):
     ax.set_xlabel('Time /days')
     ax.set_ylabel('Percentage of cases')
     ax.set_ylim(0, 1.0)
-    ax.set_xlim(0, 7)  #
+    # ax.set_xlim(0, 7)  # Number of days capped to 7, we can increase this number anytime.
+    ax.set_xlim(0, (postNumPerDay)/3)
     ax.yaxis.set_tick_params(length=0)
     ax.xaxis.set_tick_params(length=0)
     ax.grid(b=True, which='major', c='w', lw=2, ls='-')
